@@ -1,0 +1,28 @@
+{
+	"name": "PQProduct",
+	"properties": {
+		"type": "WranglingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "SourceProduct",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SourceProduct",
+					"dataset": {
+						"referenceName": "SourceProduct",
+						"type": "DatasetReference"
+					}
+				},
+				{
+					"name": "SourceProductCategory",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SourceProductCategory",
+					"dataset": {
+						"referenceName": "SourceProductCategory",
+						"type": "DatasetReference"
+					}
+				}
+			],
+			"script": "section Section1;\r\nshared SourceProduct = let AdfDoc = Sql.Database(\"sql-server-dev-01.database.windows.net\", \"AdventureWorksLT\", [CreateNavigationProperties = false]), InputTable = AdfDoc{[Schema=\"SalesLT\",Item=\"ProductRevised\"]}[Data] in InputTable;\r\nshared SourceProductCategory = let AdfDoc = Sql.Database(\"sql-server-dev-01.database.windows.net\", \"AdventureWorksLT\", [CreateNavigationProperties = false]), InputTable = AdfDoc{[Schema=\"SalesLT\",Item=\"ProductCategory\"]}[Data] in InputTable;\r\nshared UserQuery = let Source = #\"SourceProduct\",\r\n  #\"Merged queries\" = Table.NestedJoin(Source, {\"ProductCategoryID\"}, SourceProductCategory, {\"ProductCategoryID\"}, \"SourceProductCategory\", JoinKind.LeftOuter),\r\n  #\"Expanded SourceProductCategory\" = Table.ExpandTableColumn(#\"Merged queries\", \"SourceProductCategory\", {\"Name\"}, {\"Name.1\"}),\r\n  #\"Renamed columns\" = Table.RenameColumns(#\"Expanded SourceProductCategory\", {{\"Name.1\", \"ProductCategory\"}, {\"Name\", \"ProductName\"}, {\"Color\", \"ProductColor\"}}),\r\n  #\"Removed columns\" = Table.RemoveColumns(#\"Renamed columns\", {\"StandardCost\", \"ListPrice\", \"Size\", \"Weight\", \"ProductCategoryID\", \"ProductModelID\", \"SellStartDate\", \"SellEndDate\", \"DiscontinuedDate\", \"rowguid\", \"ModifiedDate\"}) in #\"Removed columns\";\r\n",
+			"documentLocale": "en-us"
+		}
+	}
+}

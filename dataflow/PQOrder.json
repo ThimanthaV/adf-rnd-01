@@ -1,0 +1,28 @@
+{
+	"name": "PQOrder",
+	"properties": {
+		"type": "WranglingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "SourceOrderHeader",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SourceOrderHeader",
+					"dataset": {
+						"referenceName": "SourceOrderHeader",
+						"type": "DatasetReference"
+					}
+				},
+				{
+					"name": "SourceOrderDetail",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SourceOrderDetail",
+					"dataset": {
+						"referenceName": "SourceOrderDetail",
+						"type": "DatasetReference"
+					}
+				}
+			],
+			"script": "section Section1;\r\nshared SourceOrderHeader = let AdfDoc = Sql.Database(\"sql-server-dev-01.database.windows.net\", \"AdventureWorksLT\", [CreateNavigationProperties = false]), InputTable = AdfDoc{[Schema=\"SalesLT\",Item=\"SalesOrderHeader\"]}[Data] in InputTable;\r\nshared SourceOrderDetail = let AdfDoc = Sql.Database(\"sql-server-dev-01.database.windows.net\", \"AdventureWorksLT\", [CreateNavigationProperties = false]), InputTable = AdfDoc{[Schema=\"SalesLT\",Item=\"SalesOrderDetail\"]}[Data] in InputTable;\r\nshared UserQuery = let Source = #\"SourceOrderHeader\",\r\n  #\"Merged queries\" = Table.NestedJoin(Source, {\"SalesOrderID\"}, SourceOrderDetail, {\"SalesOrderID\"}, \"SourceOrderDetail\", JoinKind.LeftOuter),\r\n  #\"Expanded SourceOrderDetail\" = Table.ExpandTableColumn(#\"Merged queries\", \"SourceOrderDetail\", {\"SalesOrderDetailID\", \"OrderQty\", \"ProductID\", \"LineTotal\"}, {\"SalesOrderDetailID\", \"OrderQty\", \"ProductID\", \"LineTotal\"}),\r\n  #\"Removed columns\" = Table.RemoveColumns(#\"Expanded SourceOrderDetail\", {\"RevisionNumber\", \"ShipToAddressID\", \"BillToAddressID\", \"ShipMethod\", \"CreditCardApprovalCode\", \"SubTotal\", \"TaxAmt\", \"Freight\", \"TotalDue\", \"Comment\", \"rowguid\", \"ModifiedDate\"}),\r\n  #\"Reordered columns\" = Table.ReorderColumns(#\"Removed columns\", {\"SalesOrderID\", \"SalesOrderDetailID\", \"OrderDate\", \"DueDate\", \"ShipDate\", \"SalesOrderNumber\", \"PurchaseOrderNumber\", \"AccountNumber\", \"CustomerID\", \"ProductID\", \"Status\", \"OnlineOrderFlag\", \"OrderQty\", \"LineTotal\"}),\r\n  #\"Grouped rows\" = Table.Group(#\"Reordered columns\", {\"SalesOrderID\", \"SalesOrderDetailID\", \"OrderDate\", \"DueDate\", \"ShipDate\", \"SalesOrderNumber\", \"PurchaseOrderNumber\", \"AccountNumber\", \"CustomerID\", \"ProductID\", \"Status\", \"OnlineOrderFlag\"}, {{\"SalesQuantity\", each List.Sum([OrderQty]), type nullable number}, {\"SalesAmount\", each List.Sum([LineTotal]), type nullable number}}) in #\"Grouped rows\";\r\n",
+			"documentLocale": "en-us"
+		}
+	}
+}

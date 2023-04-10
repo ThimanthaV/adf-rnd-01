@@ -1,0 +1,9 @@
+{
+	"name": "tv-adf-dev-01",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "220e25b7-9c71-46b0-908d-fbb30ebf84f5",
+		"tenantId": "da9a94b6-4681-49bc-bd7c-bab9eac0ad3c"
+	}
+}

@@ -1,0 +1,20 @@
+{
+	"name": "MetadataDrivenCopyTask_241_ControlDS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "adventureworksdb",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "MetadataDrivenCopyTask_241_20220927"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "MainControlTable"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
