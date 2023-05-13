@@ -1,0 +1,20 @@
+{
+	"name": "PQCustomerToronto",
+	"properties": {
+		"type": "WranglingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "RawCustomer",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~>  RawCustomer",
+					"dataset": {
+						"referenceName": "RawCustomer",
+						"type": "DatasetReference"
+					}
+				}
+			],
+			"script": "section Section1;\r\nshared RawCustomer = let AdfDoc = AzureStorage.DataLakeContents(\"https://tvrnddl01.dfs.core.windows.net/raw/Customer/Customer.csv\"),Csv = Csv.Document(AdfDoc, [Delimiter = \",\", Encoding = TextEncoding.Utf8, QuoteStyle = QuoteStyle.Csv]), PromotedHeaders = Table.PromoteHeaders(Csv, [PromoteAllScalars = true]) in  PromotedHeaders;\r\nshared UserQuery = let Source = #\"RawCustomer\",\r\n  #\"Removed columns\" = Table.RemoveColumns(Source, {\"MiddleName\", \"Suffix\", \"SalesPerson\", \"EmailAddress\", \"Phone\", \"PasswordHash\", \"PasswordSalt\", \"rowguid\", \"ModifiedDate\", \"NameStyle\", \"Title\"}) in #\"Removed columns\";\r\nshared #\"UserQuery (2)\" = let Source = #\"RawCustomer\",\r\n  #\"Removed columns\" = Table.RemoveColumns(Source, {\"NameStyle\", \"Title\", \"MiddleName\", \"Suffix\", \"PasswordHash\", \"PasswordSalt\", \"rowguid\", \"ModifiedDate\"}) in #\"Removed columns\";\r\n",
+			"documentLocale": "en-us"
+		}
+	}
+}
