@@ -32,10 +32,7 @@
 					"value": "@dataset().cw_folderPath",
 					"type": "Expression"
 				},
-				"fileSystem": {
-					"value": "data3",
-					"type": "Expression"
-				}
+				"fileSystem": "raw"
 			},
 			"compressionCodec": "snappy"
 		},
