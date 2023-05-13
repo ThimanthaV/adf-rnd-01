@@ -11,8 +11,8 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": "SalesLTProductCategory.parquet ",
-				"folderPath": "raw/ProductCategory",
-				"fileSystem": "data"
+				"folderPath": "ProductCategory",
+				"fileSystem": "raw"
 			},
 			"compressionCodec": "snappy"
 		},
