@@ -10,8 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "stage/Customer/CustomerDetails",
-				"fileSystem": "data"
+				"folderPath": "Customer/CustomerDetails",
+				"fileSystem": "cleansed"
 			},
 			"compressionCodec": "snappy"
 		},
